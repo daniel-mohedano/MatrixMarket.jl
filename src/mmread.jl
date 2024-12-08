@@ -74,13 +74,19 @@ end
 function parse_symmetric(symm::String)
     if symm == "general"
         return identity
-    elseif symm == "symmetric" || symm == "hermitian"
+    elseif symm == "symmetric"
+        return symmetrize!
+    elseif symm == "hermitian"
         return hermitianize!
     elseif symm == "skew-symmetric"
         return skewsymmetrize!
     else
         throw(FileFormatException("Unknown matrix symmetry: $symm."))
     end
+end
+
+function symmetrize!(M::AbstractMatrix)
+    M .+= transpose(tril(M, -1))
 end
 
 function hermitianize!(M::AbstractMatrix)
