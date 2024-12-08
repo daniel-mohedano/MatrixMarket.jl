@@ -21,7 +21,7 @@ function mminfo(filename::String)
 end
 
 function mminfo(stream::IO)
-    firstline = chomp(readline(stream))
+    firstline = strip(chomp(readline(stream)))
     if !startswith(firstline, "%%MatrixMarket")
         throw(FileFormatException("Expected start of header `%%MatrixMarket`"))
     end
