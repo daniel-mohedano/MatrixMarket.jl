@@ -47,9 +47,9 @@ function mmread(stream::IO, infoonly::Bool=false, retcoord::Bool=false)
         end
 
         result = retcoord ? (rn, cn, vals, rows, cols, entries, rep, field, symm) :
-                            symfunc(sparse(rn, cn, vals, rows, cols))
+                 symfunc(sparse(rn, cn, vals, rows, cols))
     else
-        vals = [parse(Float64, readline(stream)) for _ in 1:entries]
+        vals = [parse_array_value(Float64, readline(stream)) for _ in 1:entries]
         A = reshape(vals, rows, cols)
         result = symfunc(A)
     end
@@ -106,6 +106,19 @@ end
 
 parse_val(line, splits, ::Type{Bool}) = true
 parse_val(line, splits, ::Type{T}) where {T} = parse(T, line[splits[2]:length(line)])
+
+function parse_array_value(type::Type, input::String)
+    if type == ComplexF64
+        if length(split(input)) < 2
+            throw(FileFormatException("Error parsing complex number: $input"))
+        end
+        real_value = split(input)[1]
+        imag_value = split(input)[2]
+        return Complex{Float64}(real_value, imag_value)
+    else
+        return parse(type, input)
+    end
+end
 
 num_splits(::Type{ComplexF64}) = 3
 num_splits(::Type{Bool}) = 1
